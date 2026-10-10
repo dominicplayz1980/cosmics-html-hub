@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cosmics HTML Hub</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#121a2c;--line:#25334e;--text:#eef3ff;--muted:#a5b4d0;--accent:#8b7cff}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,Segoe UI,sans-serif;background:radial-gradient(ellipse at top,#18254a 0,#090d18 55%);color:var(--text);min-height:100vh}
+header{padding:24px max(20px,calc((100% - 1050px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}
+.brand{font-weight:850;font-size:1.2rem;letter-spacing:.3px}.brand span{color:#a69cff}a{color:inherit}.owner{border:1px solid var(--line);padding:9px 14px;border-radius:12px;text-decoration:none;color:var(--muted)}
+main{max-width:1050px;margin:50px auto;padding:0 20px}.hero{padding:30px 0 25px}.eyebrow{color:#b6adff;font-size:.78rem;font-weight:800;letter-spacing:2px;text-transform:uppercase}h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.03;margin:12px 0}p{color:var(--muted)}.search{width:100%;background:#0d1425;border:1px solid var(--line);border-radius:14px;padding:15px;color:var(--text);font:inherit;margin:15px 0 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:15px}.card{background:linear-gradient(150deg,#18233a,#101626);border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}.fileicon{font-size:1.8rem}.card h2{font-size:1.05rem;overflow-wrap:anywhere}.meta{font-size:.85rem;color:var(--muted)}.download{display:block;text-align:center;margin-top:17px;background:var(--accent);color:white;font-weight:750;text-decoration:none;padding:11px;border-radius:11px}.empty{padding:35px;text-align:center;border:1px dashed var(--line);border-radius:18px;color:var(--muted)}footer{text-align:center;padding:35px 20px;color:var(--muted);font-size:.85rem}
+</style></head>
+<body>
+<header><div class="brand">☄ <span>Cosmics</span> HTML Hub</div><a class="owner" href="/admin">Owner panel</a></header>
+<main><section class="hero"><div class="eyebrow">HTML downloads</div><h1>Your files<br>in one place</h1><p>Download HTML files shared by the owner.</p></section>
+<input id="search" class="search" placeholder="Search files..." aria-label="Search files">
+<div id="files" class="grid"><div class="empty">Loading files…</div></div>
+</main><footer>Cosmics HTML Hub · Only download files you trust. HTML files can run code when you open them.</footer>
+<script>
+const root=document.getElementById('files'), search=document.getElementById('search');let all=[];
+function size(n){if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(1)+' KB';return (n/1048576).toFixed(1)+' MB'}
+function render(){const q=search.value.trim().toLowerCase(),items=all.filter(f=>f.name.toLowerCase().includes(q));if(!items.length){root.innerHTML='<div class="empty">No files found yet.</div>';return}root.innerHTML=items.map(f=>`<article class="card"><div class="fileicon">📄</div><h2>${escapeHtml(f.name)}</h2><div class="meta">${size(f.size)} · Added ${new Date(f.uploadedAt).toLocaleDateString()}</div><a class="download" href="/download/${encodeURIComponent(f.id)}">Download HTML</a></article>`).join('')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+search.addEventListener('input',render);fetch('/api/files').then(r=>r.json()).then(data=>{all=data;render()}).catch(()=>root.innerHTML='<div class="empty">Could not load files. Refresh and try again.</div>');
+</script></body></html>
